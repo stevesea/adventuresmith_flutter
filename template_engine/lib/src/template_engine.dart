@@ -1,35 +1,20 @@
+import 'package:adventuresmith_template_engine/src/grammar.dart';
 import 'package:dart_dice_parser/dart_dice_parser.dart';
 import 'package:petitparser/petitparser.dart';
 
 ///
 ///
 
-class AdventureSmithTemplate {
-  Parser _parser;
-
+class TemplateEngine {
   DiceParser _diceParser;
 
-  AdventureSmithTemplate({DiceParser diceParser}) {
-    _parser = _build();
+  TemplateEngine({DiceParser diceParser}) {
     _diceParser = diceParser ?? DiceParser();
   }
 
-  Parser _build() {
-    var builder = ExpressionBuilder();
-    // build groups in descending order of operations
-    // * parens, ints
-    // * variations of dice-expr
-    // * mult
-    // * add/sub
-    builder.group()
-      // match ints. will return null if empty
-      ..primitive(digit()
-          .star()
-          .flatten('integer expected') // create string result of digit*
-          .trim() // trim whitespace
-          .map((a) => a.isNotEmpty ? int.parse(a) : null))
-      // handle parens
-      ..wrapper(char('(').trim(), char(')').trim(), (l, a, r) => a);
-    return builder.build().end();
+  Result<dynamic> parse(String template, Map<String, dynamic> ctxt) {
+    var parser = JsonParser();
+
+    return parser.parse(template);
   }
 }
