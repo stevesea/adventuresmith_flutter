@@ -14,9 +14,9 @@ class OrdinalDiceResult {
 class DiceExplorer extends StatelessWidget {
   const DiceExplorer({Key key}) : super(key: key);
 
-  static List<charts.Series<OrdinalDiceResult, String>> gatherStats(
+  static List<charts.Series<OrdinalDiceResult, int>> gatherStats(
       DiceExpressions diceExpressions) {
-    var stats = <charts.Series<OrdinalDiceResult, String>>[];
+    var stats = <charts.Series<OrdinalDiceResult, int>>[];
     for (final diceExpressionModel in diceExpressions.expressions) {
       if (diceExpressionModel.stats.isNotEmpty) {
         var histAsList = <OrdinalDiceResult>[];
@@ -27,10 +27,11 @@ class DiceExplorer extends StatelessWidget {
               .toList();
         }
 
-        stats.add(charts.Series<OrdinalDiceResult, String>(
+        stats.add(charts.Series<OrdinalDiceResult, int>(
           id: diceExpressionModel.diceExpression,
-          domainFn: (OrdinalDiceResult r, _) => r.result.toString(),
+          domainFn: (OrdinalDiceResult r, _) => r.result,
           measureFn: (OrdinalDiceResult r, _) => r.count,
+          colorFn: (_, __) => charts.MaterialPalette.red.shadeDefault,
           data: histAsList,
         ));
       }
@@ -55,13 +56,14 @@ class DiceExplorer extends StatelessWidget {
                 ),
               ),
               Divider(),
+              //Spacer(),
               Expanded(
-                child: charts.BarChart(
-                  gatherStats(diceExpressions),
-                  animate: false,
-                  barGroupingType: charts.BarGroupingType.grouped,
-                  behaviors: [charts.SeriesLegend()],
-                ),
+                child: charts.LineChart(gatherStats(diceExpressions),
+                    animate: true,
+                    behaviors: [charts.SeriesLegend()],
+                    primaryMeasureAxis: charts.NumericAxisSpec(
+                        showAxisLine: false, // don't show axis line
+                        renderSpec: charts.NoneRenderSpec())),
               ),
             ]),
       );
