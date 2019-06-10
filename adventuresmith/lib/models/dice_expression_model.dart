@@ -32,7 +32,7 @@ class DiceExpressions with ChangeNotifier {
 
 /// a dice expression, parsing results, and related stats.
 class DiceExpressionModel {
-  static final NUM_ROLLS_FOR_STATS = 10000;
+  static final numRollsForStats = 10000;
   final _log = Logger('DiceExpressionModel');
   DiceParser _diceParser;
 
@@ -53,9 +53,12 @@ class DiceExpressionModel {
   Result<dynamic> get parseResults => _parseResults;
   Result<dynamic> _parseResults;
 
+  /// is stats map populated?
+  bool get hasStats => _stats.isNotEmpty;
+
   /// sets the current dice expression
   void setExpression(String expr) {
-    _log.info(expr);
+    _log.finest(expr);
     _diceExpression = expr;
     if (expr == null || expr.isEmpty) {
       _stats = {};
@@ -67,8 +70,8 @@ class DiceExpressionModel {
       _stats = {};
     } else {
       _stats = _diceParser.stats(
-          diceStr: diceExpression, numRolls: NUM_ROLLS_FOR_STATS);
-      _log.info(_stats);
+          diceStr: diceExpression, numRolls: numRollsForStats);
+      _log.finest(_stats);
     }
   }
 }

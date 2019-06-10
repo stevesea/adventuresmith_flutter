@@ -1,4 +1,5 @@
 import 'package:adventuresmith/models/dice_expression_model.dart';
+import 'package:charts_common/common.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
@@ -13,31 +14,6 @@ class OrdinalDiceResult {
 
 class DiceExplorer extends StatelessWidget {
   const DiceExplorer({Key key}) : super(key: key);
-
-  static List<charts.Series<OrdinalDiceResult, int>> gatherStats(
-      DiceExpressions diceExpressions) {
-    var stats = <charts.Series<OrdinalDiceResult, int>>[];
-    for (final diceExpressionModel in diceExpressions.expressions) {
-      if (diceExpressionModel.stats.isNotEmpty) {
-        var histAsList = <OrdinalDiceResult>[];
-        var hist = diceExpressionModel.stats['histogram'] ?? <int, int>{};
-        if (hist is Map<int, int>) {
-          histAsList = hist.entries
-              .map((e) => OrdinalDiceResult(e.key, e.value))
-              .toList();
-        }
-
-        stats.add(charts.Series<OrdinalDiceResult, int>(
-          id: diceExpressionModel.diceExpression,
-          domainFn: (OrdinalDiceResult r, _) => r.result,
-          measureFn: (OrdinalDiceResult r, _) => r.count,
-          colorFn: (_, __) => charts.MaterialPalette.red.shadeDefault,
-          data: histAsList,
-        ));
-      }
-    }
-    return stats;
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,14 +32,8 @@ class DiceExplorer extends StatelessWidget {
                 ),
               ),
               Divider(),
-              //Spacer(),
               Expanded(
-                child: charts.LineChart(gatherStats(diceExpressions),
-                    animate: true,
-                    behaviors: [charts.SeriesLegend()],
-                    primaryMeasureAxis: charts.NumericAxisSpec(
-                        showAxisLine: false, // don't show axis line
-                        renderSpec: charts.NoneRenderSpec())),
+                child: DiceStats(diceExpressions.expressions),
               ),
             ]),
       );
@@ -71,6 +41,103 @@ class DiceExplorer extends StatelessWidget {
   }
 }
 
+@immutable
+class DiceStats extends StatelessWidget {
+  static final palettes = [
+    MaterialPalette.blue,
+    MaterialPalette.green,
+    MaterialPalette.red,
+  ];
+
+  final List<DiceExpressionModel> exprs;
+  const DiceStats(this.exprs, {Key key}) : super(key: key);
+
+  List<charts.Series<OrdinalDiceResult, int>> gatherSeries() {
+    var stats = <charts.Series<OrdinalDiceResult, int>>[];
+    var ind = 0;
+    for (final diceExpressionModel in exprs) {
+      if (diceExpressionModel.hasStats) {
+        var histAsList = <OrdinalDiceResult>[];
+        var hist = diceExpressionModel.stats['histogram'] ?? <int, int>{};
+        var palette = palettes[ind].shadeDefault;
+        if (hist is Map<int, int>) {
+          histAsList = hist.entries
+              .map((e) => OrdinalDiceResult(e.key, e.value))
+              .toList();
+        }
+
+        stats.add(charts.Series<OrdinalDiceResult, int>(
+          id: diceExpressionModel.diceExpression,
+          domainFn: (OrdinalDiceResult r, _) => r.result,
+          measureFn: (OrdinalDiceResult r, _) => r.count,
+          data: histAsList,
+          colorFn: (_, __) => palette,
+        ));
+      }
+      ind++;
+    }
+    return stats;
+  }
+
+  List<charts.ChartBehavior> gatherBehaviors() {
+    var behaviors = <charts.ChartBehavior>[];
+    var rangeAnnotations = <AnnotationSegment>[];
+    var ind = 0;
+    for (final diceExpressionModel in exprs) {
+      if (diceExpressionModel.hasStats) {
+        var median = diceExpressionModel.stats["median"];
+        var stddev = diceExpressionModel.stats["standardDeviation"];
+        var low = median - stddev;
+        var high = median + stddev;
+        var palette = palettes[ind].shadeDefault;
+        rangeAnnotations.add(charts.RangeAnnotationSegment(
+          low,
+          high,
+          charts.RangeAnnotationAxisType.domain,
+          startLabel: low.toString(),
+          endLabel: high.toString(),
+        ));
+        rangeAnnotations.add(
+          charts.LineAnnotationSegment(
+            median,
+            charts.RangeAnnotationAxisType.domain,
+            startLabel: median.toString(),
+            color: palette.lighter,
+          ),
+        );
+      }
+      ind++;
+    }
+    behaviors.add(charts.RangeAnnotation(rangeAnnotations));
+    return behaviors;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    var seriesList = gatherSeries();
+    if (seriesList.isEmpty) {
+      seriesList.add(
+        charts.Series<OrdinalDiceResult, int>(
+          id: "",
+          domainFn: (OrdinalDiceResult r, _) => r.result,
+          measureFn: (OrdinalDiceResult r, _) => r.count,
+          data: [],
+        ),
+      );
+    }
+    return charts.LineChart(
+      seriesList,
+      animate: true,
+      behaviors: gatherBehaviors(),
+      primaryMeasureAxis: charts.NumericAxisSpec(
+        showAxisLine: false, // don't show axis line
+        renderSpec: charts.NoneRenderSpec(),
+      ),
+    );
+  }
+}
+
+@immutable
 class DiceExpressionItem extends StatelessWidget {
   final int index;
 
@@ -81,12 +148,22 @@ class DiceExpressionItem extends StatelessWidget {
     Logger _log = Logger('DiceExplorer');
 
     final expressions = Provider.of<DiceExpressions>(context);
-    final expressionModel = expressions.expressions[index];
+    final model = expressions.expressions[index];
 
-    final controller =
-        TextEditingController(text: expressionModel.diceExpression);
+    final controller = TextEditingController(text: model.diceExpression);
 
     final statsKeys = ['min', 'max', 'median', 'mean', 'standardDeviation'];
+
+    final medianResults = <Widget>[];
+    if (model.hasStats) {
+      medianResults.addAll([
+        Spacer(),
+        Text("Median:"),
+        Text(model.stats["median"].toString()),
+        Text("+/-"),
+        Text(model.stats["standardDeviation"].toString()),
+      ]);
+    }
     return Column(
       children: [
         TextField(
@@ -108,8 +185,7 @@ class DiceExpressionItem extends StatelessWidget {
                     Text("min:"),
                     Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child:
-                          Text(expressionModel.stats['min'].toString() ?? ""),
+                      child: Text(model.stats['min'].toString() ?? ""),
                     ),
                   ],
                 ),
@@ -118,8 +194,7 @@ class DiceExpressionItem extends StatelessWidget {
                     Text("max:"),
                     Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child:
-                          Text(expressionModel.stats['max'].toString() ?? ""),
+                      child: Text(model.stats['max'].toString() ?? ""),
                     ),
                   ],
                 ),
@@ -133,8 +208,7 @@ class DiceExpressionItem extends StatelessWidget {
                     Text("median:"),
                     Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                          expressionModel.stats['median'].toString() ?? ""),
+                      child: Text(model.stats['median'].toString() ?? ""),
                     ),
                   ],
                 ),
@@ -143,8 +217,7 @@ class DiceExpressionItem extends StatelessWidget {
                     Text("mean:"),
                     Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child:
-                          Text(expressionModel.stats['mean'].toString() ?? ""),
+                      child: Text(model.stats['mean'].toString() ?? ""),
                     ),
                   ],
                 ),
@@ -158,9 +231,8 @@ class DiceExpressionItem extends StatelessWidget {
                     Text("stddev:"),
                     Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: Text(expressionModel.stats['standardDeviation']
-                              .toString() ??
-                          ""),
+                      child: Text(
+                          model.stats['standardDeviation'].toString() ?? ""),
                     ),
                   ],
                 ),
