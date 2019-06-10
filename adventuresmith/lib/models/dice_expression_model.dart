@@ -74,4 +74,12 @@ class DiceExpressionModel {
       _log.finest(_stats);
     }
   }
+
+  //final RegExp diceExp = RegExp(r'[A-Za-z0-9 +-<>');
+
+  /// returns null if OK, string otherwise
+  String validator(String val) {
+    _log.warning("validating $val");
+    return "valid";
+  }
 }

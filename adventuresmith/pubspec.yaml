@@ -19,7 +19,9 @@ environment:
 dependencies:
   charts_flutter: ^0.6.0
   provider: ^3.0.0
-  dart_dice_parser: ^1.3.5
+  dart_dice_parser: ^1.3.6
+  material_design_icons_flutter: 3.2.3695
+
   flutter:
     sdk: flutter
 

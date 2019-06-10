@@ -42,7 +42,7 @@ class AdventuresmithApp extends StatelessWidget {
     var testExpressions = DiceExpressions();
     testExpressions.add(DiceExpressionModel());
     testExpressions.add(DiceExpressionModel());
-    //testExpressions.add(DiceExpressionModel());
+    testExpressions.add(DiceExpressionModel());
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(builder: (_) => Counter()),
