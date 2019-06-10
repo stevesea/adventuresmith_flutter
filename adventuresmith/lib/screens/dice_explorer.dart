@@ -6,8 +6,8 @@ import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 
 class OrdinalDiceResult {
-  final int result;
-  final int count;
+  final num result;
+  final num count;
 
   OrdinalDiceResult(this.result, this.count);
 }
@@ -52,31 +52,52 @@ class DiceStats extends StatelessWidget {
   final List<DiceExpressionModel> exprs;
   const DiceStats(this.exprs, {Key key}) : super(key: key);
 
-  List<charts.Series<OrdinalDiceResult, int>> gatherSeries() {
-    var stats = <charts.Series<OrdinalDiceResult, int>>[];
+  List<charts.Series<OrdinalDiceResult, num>> gatherSeries() {
+    var series = <charts.Series<OrdinalDiceResult, num>>[];
     var ind = 0;
     for (final diceExpressionModel in exprs) {
       if (diceExpressionModel.hasStats) {
         var histAsList = <OrdinalDiceResult>[];
-        var hist = diceExpressionModel.stats['histogram'] ?? <int, int>{};
+
+        var hist = diceExpressionModel.stats['histogram'] ?? <num, num>{};
         var palette = palettes[ind].shadeDefault;
-        if (hist is Map<int, int>) {
+        if (hist is Map<num, num>) {
           histAsList = hist.entries
               .map((e) => OrdinalDiceResult(e.key, e.value))
               .toList();
         }
 
-        stats.add(charts.Series<OrdinalDiceResult, int>(
+        series.add(charts.Series<OrdinalDiceResult, num>(
           id: diceExpressionModel.diceExpression,
           domainFn: (OrdinalDiceResult r, _) => r.result,
           measureFn: (OrdinalDiceResult r, _) => r.count,
           data: histAsList,
           colorFn: (_, __) => palette,
         ));
+
+        var median = diceExpressionModel.stats["median"];
+        var stddev = diceExpressionModel.stats["standardDeviation"];
+        var low = median - stddev;
+        var high = median + stddev;
+
+        series.add(charts.Series<OrdinalDiceResult, num>(
+          id: diceExpressionModel.diceExpression + "annotation",
+          domainFn: (OrdinalDiceResult r, _) => median,
+          domainLowerBoundFn: (OrdinalDiceResult r, _) => low,
+          domainUpperBoundFn: (OrdinalDiceResult r, _) => high,
+          measureFn: (_, __) =>
+              null, // no measure values are needed for symbol annotations
+          data: [
+            OrdinalDiceResult(low, null),
+            OrdinalDiceResult(median, null),
+            OrdinalDiceResult(high, null),
+          ],
+          colorFn: (_, __) => palette,
+        )..setAttribute(charts.rendererIdKey, 'customSymbolAnnotation'));
       }
       ind++;
     }
-    return stats;
+    return series;
   }
 
   List<charts.ChartBehavior> gatherBehaviors() {
@@ -96,19 +117,28 @@ class DiceStats extends StatelessWidget {
           charts.RangeAnnotationAxisType.domain,
           startLabel: low.toString(),
           endLabel: high.toString(),
+          color: palette.lighter.lighter.lighter,
+          labelAnchor: charts.AnnotationLabelAnchor.start,
+          labelDirection: charts.AnnotationLabelDirection.vertical,
         ));
+
         rangeAnnotations.add(
           charts.LineAnnotationSegment(
             median,
             charts.RangeAnnotationAxisType.domain,
             startLabel: median.toString(),
             color: palette.lighter,
+            labelAnchor: charts.AnnotationLabelAnchor.end,
+            labelDirection: charts.AnnotationLabelDirection.horizontal,
           ),
         );
       }
       ind++;
     }
-    behaviors.add(charts.RangeAnnotation(rangeAnnotations));
+    behaviors.add(charts.RangeAnnotation(
+      rangeAnnotations,
+      defaultLabelPosition: charts.AnnotationLabelPosition.margin,
+    ));
     return behaviors;
   }
 
@@ -117,7 +147,7 @@ class DiceStats extends StatelessWidget {
     var seriesList = gatherSeries();
     if (seriesList.isEmpty) {
       seriesList.add(
-        charts.Series<OrdinalDiceResult, int>(
+        charts.Series<OrdinalDiceResult, num>(
           id: "",
           domainFn: (OrdinalDiceResult r, _) => r.result,
           measureFn: (OrdinalDiceResult r, _) => r.count,
@@ -133,6 +163,11 @@ class DiceStats extends StatelessWidget {
         showAxisLine: false, // don't show axis line
         renderSpec: charts.NoneRenderSpec(),
       ),
+      customSeriesRenderers: [
+        charts.SymbolAnnotationRendererConfig(
+          customRendererId: 'customSymbolAnnotation',
+        ),
+      ],
     );
   }
 }
