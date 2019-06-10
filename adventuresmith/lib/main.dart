@@ -22,47 +22,16 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(builder: (_) => Counter()),
       ],
-      child: Consumer<Counter>(
-        builder: (context, counter, _) {
-          return MaterialApp(
-            supportedLocales: const [Locale('en')],
-            localizationsDelegates: [
-              DefaultMaterialLocalizations.delegate,
-              DefaultWidgetsLocalizations.delegate,
-              _ExampleLocalizationsDelegate(counter.count),
-            ],
-            home: const MyHomePage(),
-          );
-        },
+      child: MaterialApp(
+        supportedLocales: const [Locale('en')],
+        localizationsDelegates: [
+          DefaultMaterialLocalizations.delegate,
+          DefaultWidgetsLocalizations.delegate,
+        ],
+        home: const MyHomePage(),
       ),
     );
   }
-}
-
-class ExampleLocalizations {
-  static ExampleLocalizations of(BuildContext context) =>
-      Localizations.of<ExampleLocalizations>(context, ExampleLocalizations);
-
-  const ExampleLocalizations(this._count);
-
-  final int _count;
-
-  String get title => 'Tapped $_count times';
-}
-
-class _ExampleLocalizationsDelegate extends LocalizationsDelegate<ExampleLocalizations> {
-  const _ExampleLocalizationsDelegate(this.count);
-
-  final int count;
-
-  @override
-  bool isSupported(Locale locale) => locale.languageCode == 'en';
-
-  @override
-  Future<ExampleLocalizations> load(Locale locale) => SynchronousFuture(ExampleLocalizations(count));
-
-  @override
-  bool shouldReload(_ExampleLocalizationsDelegate old) => old.count != count;
 }
 
 class MyHomePage extends StatelessWidget {
@@ -70,11 +39,13 @@ class MyHomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Title()),
-      body: const Center(child: CounterLabel()),
-      floatingActionButton: const IncrementCounterButton(),
-    );
+    return Consumer<Counter>(builder: (context, counter, _) {
+      return Scaffold(
+        appBar: AppBar(title: const Title()),
+        body: const Center(child: CounterLabel()),
+        floatingActionButton: const IncrementCounterButton(),
+      );
+    });
   }
 }
 
@@ -118,6 +89,7 @@ class Title extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(ExampleLocalizations.of(context).title);
+    final counter = Provider.of<Counter>(context);
+    return Text('Tapped ${counter.count} times');
   }
 }
