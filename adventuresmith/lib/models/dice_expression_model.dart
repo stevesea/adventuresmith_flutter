@@ -72,9 +72,9 @@ class DiceExpressionModel {
 
   /// returns null if OK, string otherwise
   String validator(String val) {
-    final RegExp diceExp = RegExp(r'^[dDcClLhHF0-9 +-<>%]*$');
+    final RegExp diceExp = RegExp(r'^[dDcClLhHF0-9 +-<>%#!=]*$');
     if (!diceExp.hasMatch(val)) {
-      return "valid characters: dclhF, 0-9";
+      return "must match: ${diceExp.pattern}";
     }
 
     var results = _diceParser.parse(val);
