@@ -226,32 +226,32 @@ class DiceExpressionItem extends StatelessWidget {
     }
     return Column(
       children: [
-        Theme(
-            data: Theme.of(context).copyWith(
-              primaryColor: DiceStats.colors[index],
-              unselectedWidgetColor: DiceStats.colors[index],
-            ),
-            child: TextFormField(
-              textCapitalization: TextCapitalization.none,
-              decoration: const InputDecoration(
-                hintText: 'Enter a dice expression',
-                //labelText: 'The label',
-                icon: Icon(
-                  MdiIcons.diceMultiple,
-                ),
-                border: OutlineInputBorder(),
-              ),
-              initialValue: model.diceExpression,
-              onFieldSubmitted: (val) => expressions.setExpr(index, val),
-              validator: model.validator,
-            )),
         Row(
           children: [
-            Column(
-              children: [],
+            Flexible(
+              child: Theme(
+                  data: Theme.of(context).copyWith(
+                    primaryColor: DiceStats.colors[index],
+                    unselectedWidgetColor: DiceStats.colors[index],
+                  ),
+                  child: TextFormField(
+                    textCapitalization: TextCapitalization.none,
+                    decoration: const InputDecoration(
+                      hintText: 'Enter a dice expression',
+                      //labelText: 'The label',
+                      icon: Icon(
+                        MdiIcons.diceMultiple,
+                      ),
+                      border: OutlineInputBorder(),
+                    ),
+                    initialValue: model.diceExpression,
+                    onFieldSubmitted: (val) => expressions.setExpr(index, val),
+                    validator: model.validator,
+                  )),
             ),
-            Column(
-              children: [
+            Padding(
+              padding: const EdgeInsets.only(left: 8.0),
+              child: Column(children: [
                 Row(
                   children: [
                     Text("min:"),
@@ -270,11 +270,11 @@ class DiceExpressionItem extends StatelessWidget {
                     ),
                   ],
                 ),
-              ],
+              ]),
             ),
-            Spacer(),
-            Column(
-              children: [
+            Padding(
+              padding: const EdgeInsets.only(left: 8.0),
+              child: Column(children: [
                 Row(
                   children: [
                     Text("median:"),
@@ -286,21 +286,7 @@ class DiceExpressionItem extends StatelessWidget {
                 ),
                 Row(
                   children: [
-                    Text("mean:"),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(model.stats['mean'].toString() ?? ""),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            Spacer(),
-            Column(
-              children: [
-                Row(
-                  children: [
-                    Text("stddev:"),
+                    Text("+/-:"),
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Text(
@@ -308,7 +294,7 @@ class DiceExpressionItem extends StatelessWidget {
                     ),
                   ],
                 ),
-              ],
+              ]),
             ),
           ],
         ),
