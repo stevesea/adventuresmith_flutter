@@ -126,17 +126,18 @@ class DiceStats extends StatelessWidget {
   /// retrieve chart behaviors (range / line annotations, legend settings, etc)
   List<charts.ChartBehavior> gatherBehaviors() {
     var behaviors = <charts.ChartBehavior>[];
-    /*
-    var rangeAnnotations = <AnnotationSegment>[];
+
+    var annotations = <charts_common.AnnotationSegment>[];
     var ind = 0;
-    for (final diceExpressionModel in exprs) {
+    for (final diceExpressionModel in _expressions) {
       if (diceExpressionModel.hasStats) {
         var median = diceExpressionModel.stats["median"];
         var stddev = diceExpressionModel.stats["standardDeviation"];
         var low = median - stddev;
         var high = median + stddev;
         var palette = palettes[ind].shadeDefault;
-        rangeAnnotations.add(charts.RangeAnnotationSegment(
+        /*
+        annotations.add(charts.RangeAnnotationSegment(
           low,
           high,
           charts.RangeAnnotationAxisType.domain,
@@ -147,26 +148,30 @@ class DiceStats extends StatelessWidget {
           labelDirection: charts.AnnotationLabelDirection.vertical,
         ));
 
-        rangeAnnotations.add(
+         */
+
+        annotations.add(
           charts.LineAnnotationSegment(
             median,
             charts.RangeAnnotationAxisType.domain,
             startLabel: median.toString(),
             color: palette.lighter,
             labelAnchor: charts.AnnotationLabelAnchor.end,
-            labelDirection: charts.AnnotationLabelDirection.horizontal,
+            labelDirection: charts.AnnotationLabelDirection.vertical,
           ),
         );
       }
       ind++;
     }
+
     behaviors.add(charts.RangeAnnotation(
-      rangeAnnotations,
-      defaultLabelPosition: charts.AnnotationLabelPosition.margin,
+      annotations,
+      //seems to only work if label direction is horizontal
+      //defaultLabelPosition: charts.AnnotationLabelPosition.margin,
     ));
 
-     */
     // don't enable series legend until figure out how to hide series.
+    // (otherwise, the annotation series highlighting median+stddev shows up)
     //behaviors.add(charts.SeriesLegend());
     return behaviors;
   }
@@ -261,29 +266,32 @@ class DiceExpressionItemState extends State<DiceExpressionItem> {
                   ),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.only(left: 8.0),
-                child: Column(children: [
-                  Row(
-                    children: [
-                      Text("min/max:"),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text("${min ?? '?'} / ${max ?? '?'}"),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      Text("med:"),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text("${median ?? '?'} +/- ${stddev ?? '?'}"),
-                      ),
-                    ],
-                  ),
-                ]),
-              ),
+              model.hasStats
+                  ? Padding(
+                      padding: const EdgeInsets.only(left: 8.0),
+                      child: Column(children: [
+                        Row(
+                          children: [
+                            Text("min/max:"),
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text("${min ?? '?'} / ${max ?? '?'}"),
+                            ),
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            Text("med:"),
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child:
+                                  Text("${median ?? '?'} +/- ${stddev ?? '?'}"),
+                            ),
+                          ],
+                        ),
+                      ]),
+                    )
+                  : Text(""),
             ],
           ),
         ],
