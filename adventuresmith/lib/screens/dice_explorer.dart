@@ -5,6 +5,25 @@ import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:provider/provider.dart';
 
+/// list of palettes to use for different graphs
+final palettes = [
+  charts_common.MaterialPalette.blue,
+  charts_common.MaterialPalette.green,
+  charts_common.MaterialPalette.purple,
+  charts_common.MaterialPalette.deepOrange,
+  charts_common.MaterialPalette.red,
+];
+
+final colors = [for (var p in palettes) chartColorToColor(p.shadeDefault)];
+
+Color chartColorToColor(charts_common.Color c) {
+  return Color.fromARGB(c.a, c.r, c.g, c.b);
+}
+
+Color paletteIndexToColor(int index) {
+  return chartColorToColor(palettes[index].shadeDefault);
+}
+
 class OrdinalDiceResult {
   final num result;
   final num count;
@@ -47,28 +66,6 @@ class DiceExplorer extends StatelessWidget {
 /// Widget to display dice stats from given expressions
 @immutable
 class DiceStats extends StatelessWidget {
-  /// list of palettes to use for different graphs
-  static final palettes = [
-    charts_common.MaterialPalette.blue,
-    charts_common.MaterialPalette.green,
-    charts_common.MaterialPalette.purple,
-    charts_common.MaterialPalette.deepOrange,
-    charts_common.MaterialPalette.red,
-  ];
-
-  static final colors = [
-    for (var p in palettes) chartColorToColor(p.shadeDefault)
-  ];
-
-  static Color chartColorToColor(charts_common.Color c) {
-    return Color.fromARGB(c.a, c.r, c.g, c.b);
-  }
-
-  static Color paletteIndexToColor(int index) {
-    var c = palettes[index].shadeDefault;
-    return chartColorToColor(c);
-  }
-
   final List<DiceExpressionModel> _expressions;
 
   /// ctor for DiceStats widget
@@ -132,11 +129,11 @@ class DiceStats extends StatelessWidget {
     for (final diceExpressionModel in _expressions) {
       if (diceExpressionModel.hasStats) {
         var median = diceExpressionModel.stats["median"];
+        var palette = palettes[ind].shadeDefault;
+        /*
         var stddev = diceExpressionModel.stats["standardDeviation"];
         var low = median - stddev;
         var high = median + stddev;
-        var palette = palettes[ind].shadeDefault;
-        /*
         annotations.add(charts.RangeAnnotationSegment(
           low,
           high,
@@ -166,7 +163,8 @@ class DiceStats extends StatelessWidget {
 
     behaviors.add(charts.RangeAnnotation(
       annotations,
-      //seems to only work if label direction is horizontal
+      //seems to only work if label direction is horizontal,
+      // but, horiz labels makes spacing labels hard
       //defaultLabelPosition: charts.AnnotationLabelPosition.margin,
     ));
 
@@ -219,7 +217,7 @@ class DiceExpressionItem extends StatefulWidget {
 }
 
 class DiceExpressionItemState extends State<DiceExpressionItem> {
-  Color get color => DiceStats.paletteIndexToColor(index);
+  Color get color => paletteIndexToColor(index);
   final int index;
   DiceExpressionItemState(this.index);
   final _formKey = GlobalKey<FormState>();
@@ -243,8 +241,8 @@ class DiceExpressionItemState extends State<DiceExpressionItem> {
               Flexible(
                 child: Theme(
                   data: Theme.of(context).copyWith(
-                    primaryColor: DiceStats.colors[index],
-                    unselectedWidgetColor: DiceStats.colors[index],
+                    primaryColor: colors[index],
+                    unselectedWidgetColor: colors[index],
                   ),
                   child: TextFormField(
                     textCapitalization: TextCapitalization.none,
