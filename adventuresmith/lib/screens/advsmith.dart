@@ -1,6 +1,7 @@
 import 'package:adventuresmith/screens/dice_explorer.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 /// home page for the app
 class AdventuresmithHomePage extends StatefulWidget {
@@ -19,10 +20,6 @@ class _AdventuresmithHomePageState extends State<AdventuresmithHomePage> {
     DiceExplorer(),
     Text(
       'Index 1: Business',
-      style: optionStyle,
-    ),
-    Text(
-      'Index 2: School',
       style: optionStyle,
     ),
   ];
@@ -45,16 +42,12 @@ class _AdventuresmithHomePageState extends State<AdventuresmithHomePage> {
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            title: Text('Home'),
+            icon: Icon(MdiIcons.diceMultiple),
+            title: Text('Dice Stats'),
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.business),
             title: Text('Business'),
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.school),
-            title: Text('School'),
           ),
         ],
         currentIndex: _selectedIndex,
