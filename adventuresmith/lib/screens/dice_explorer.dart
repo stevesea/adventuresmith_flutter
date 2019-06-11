@@ -202,12 +202,22 @@ class DiceStats extends StatelessWidget {
   }
 }
 
-@immutable
-class DiceExpressionItem extends StatelessWidget {
+class DiceExpressionItem extends StatefulWidget {
   final int index;
-  Color get color => DiceStats.paletteIndexToColor(index);
 
-  const DiceExpressionItem(this.index, {Key key}) : super(key: key);
+  @override
+  DiceExpressionItemState createState() {
+    return DiceExpressionItemState(index);
+  }
+
+  DiceExpressionItem(this.index, {Key key}) : super(key: key);
+}
+
+class DiceExpressionItemState extends State<DiceExpressionItem> {
+  Color get color => DiceStats.paletteIndexToColor(index);
+  final int index;
+  DiceExpressionItemState(this.index);
+  final _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
@@ -219,58 +229,65 @@ class DiceExpressionItem extends StatelessWidget {
     var min = model.stats['min'];
     var max = model.stats['max'];
 
-    return Column(
-      children: [
-        Row(
-          children: [
-            Flexible(
-              child: Theme(
-                data: Theme.of(context).copyWith(
-                  primaryColor: DiceStats.colors[index],
-                  unselectedWidgetColor: DiceStats.colors[index],
-                ),
-                child: TextFormField(
-                  textCapitalization: TextCapitalization.none,
-                  decoration: const InputDecoration(
-                    hintText: 'Enter a dice expression',
-                    //labelText: 'The label',
-                    icon: Icon(
-                      MdiIcons.diceMultiple,
-                    ),
-                    border: OutlineInputBorder(),
+    return Form(
+      key: _formKey,
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Flexible(
+                child: Theme(
+                  data: Theme.of(context).copyWith(
+                    primaryColor: DiceStats.colors[index],
+                    unselectedWidgetColor: DiceStats.colors[index],
                   ),
-                  initialValue: model.diceExpression,
-                  onFieldSubmitted: (val) => expressions.setExpr(index, val),
-                  validator: model.validator,
+                  child: TextFormField(
+                    textCapitalization: TextCapitalization.none,
+                    decoration: const InputDecoration(
+                      hintText: 'Enter a dice expression',
+                      //labelText: 'The label',
+                      icon: Icon(
+                        MdiIcons.diceMultiple,
+                      ),
+                      border: OutlineInputBorder(),
+                    ),
+                    initialValue: model.diceExpression,
+                    onFieldSubmitted: (val) {
+                      if (_formKey.currentState.validate()) {
+                        expressions.setExpr(index, val);
+                      }
+                    },
+                    validator: model.validator,
+                  ),
                 ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 8.0),
-              child: Column(children: [
-                Row(
-                  children: [
-                    Text("min/max:"),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text("${min ?? '?'} / ${max ?? '?'}"),
-                    ),
-                  ],
-                ),
-                Row(
-                  children: [
-                    Text("med:"),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text("${median ?? '?'} +/- ${stddev ?? '?'}"),
-                    ),
-                  ],
-                ),
-              ]),
-            ),
-          ],
-        ),
-      ],
+              Padding(
+                padding: const EdgeInsets.only(left: 8.0),
+                child: Column(children: [
+                  Row(
+                    children: [
+                      Text("min/max:"),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text("${min ?? '?'} / ${max ?? '?'}"),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      Text("med:"),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text("${median ?? '?'} +/- ${stddev ?? '?'}"),
+                      ),
+                    ],
+                  ),
+                ]),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }

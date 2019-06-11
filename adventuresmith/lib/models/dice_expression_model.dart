@@ -1,7 +1,6 @@
 import 'package:dart_dice_parser/dart_dice_parser.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:logging/logging.dart';
-import 'package:petitparser/petitparser.dart';
 
 /// represents the current set of dice expressions being displayed
 class DiceExpressions with ChangeNotifier {
@@ -49,10 +48,6 @@ class DiceExpressionModel {
   Map<String, dynamic> get stats => _stats;
   Map<String, dynamic> _stats = {};
 
-  /// result of parsing the current expression
-  Result<dynamic> get parseResults => _parseResults;
-  Result<dynamic> _parseResults;
-
   /// is stats map populated?
   bool get hasStats => _stats.isNotEmpty;
 
@@ -65,8 +60,8 @@ class DiceExpressionModel {
       return;
     }
 
-    _parseResults = _diceParser.parse(_diceExpression);
-    if (_parseResults.isFailure) {
+    var results = _diceParser.parse(_diceExpression);
+    if (results.isFailure) {
       _stats = {};
     } else {
       _stats = _diceParser.stats(
@@ -75,11 +70,20 @@ class DiceExpressionModel {
     }
   }
 
-  //final RegExp diceExp = RegExp(r'[A-Za-z0-9 +-<>');
-
   /// returns null if OK, string otherwise
   String validator(String val) {
-    _log.warning("validating $val");
-    return "valid";
+    final RegExp diceExp = RegExp(r'^[dDcClLhHF0-9 +-<>%]*$');
+    if (!diceExp.hasMatch(val)) {
+      return "valid characters: dclhF, 0-9";
+    }
+
+    var results = _diceParser.parse(val);
+
+    if (results.isFailure) {
+      _log.warning("Invalid $results");
+      return "err at position ${results.position}";
+    } else {
+      return null;
+    }
   }
 }
