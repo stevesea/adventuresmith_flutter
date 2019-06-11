@@ -43,6 +43,7 @@ class AdventuresmithApp extends StatelessWidget {
     testExpressions.add(DiceExpressionModel());
     testExpressions.add(DiceExpressionModel());
     testExpressions.add(DiceExpressionModel());
+    testExpressions.add(DiceExpressionModel());
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(builder: (_) => Counter()),

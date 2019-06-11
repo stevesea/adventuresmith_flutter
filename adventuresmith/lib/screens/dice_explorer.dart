@@ -2,7 +2,6 @@ import 'package:adventuresmith/models/dice_expression_model.dart';
 import 'package:charts_common/common.dart' as charts_common;
 import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:flutter/material.dart';
-import 'package:logging/logging.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:provider/provider.dart';
 
@@ -20,16 +19,19 @@ class DiceExplorer extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<DiceExpressions>(builder: (context, diceExpressions, _) {
       return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+        padding: const EdgeInsets.symmetric(horizontal: 10.0),
         child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Expanded(
-                child: ListView.separated(
-                  itemCount: diceExpressions.expressions.length,
-                  separatorBuilder: (context, index) => Divider(),
-                  itemBuilder: (context, index) => DiceExpressionItem(index),
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 10.0),
+                  child: ListView.separated(
+                    itemCount: diceExpressions.expressions.length,
+                    separatorBuilder: (context, index) => Divider(),
+                    itemBuilder: (context, index) => DiceExpressionItem(index),
+                  ),
                 ),
               ),
               Divider(),
@@ -50,6 +52,8 @@ class DiceStats extends StatelessWidget {
     charts_common.MaterialPalette.blue,
     charts_common.MaterialPalette.green,
     charts_common.MaterialPalette.purple,
+    charts_common.MaterialPalette.deepOrange,
+    charts_common.MaterialPalette.red,
   ];
 
   static final colors = [
@@ -207,12 +211,8 @@ class DiceExpressionItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Logger _log = Logger('DiceExplorer');
-
     final expressions = Provider.of<DiceExpressions>(context);
     final model = expressions.expressions[index];
-
-    final statsKeys = ['min', 'max', 'median', 'mean', 'standardDeviation'];
 
     final medianResults = <Widget>[];
     if (model.hasStats) {
@@ -224,6 +224,12 @@ class DiceExpressionItem extends StatelessWidget {
         Text(model.stats["standardDeviation"].toString()),
       ]);
     }
+
+    var median = model.stats["median"];
+    var stddev = model.stats["standardDeviation"];
+    var min = model.stats['min'];
+    var max = model.stats['max'];
+
     return Column(
       children: [
         Row(
@@ -254,43 +260,19 @@ class DiceExpressionItem extends StatelessWidget {
               child: Column(children: [
                 Row(
                   children: [
-                    Text("min:"),
+                    Text("min/max:"),
                     Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: Text(model.stats['min'].toString() ?? ""),
+                      child: Text("${min ?? '?'} / ${max ?? '?'}"),
                     ),
                   ],
                 ),
                 Row(
                   children: [
-                    Text("max:"),
+                    Text("med:"),
                     Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: Text(model.stats['max'].toString() ?? ""),
-                    ),
-                  ],
-                ),
-              ]),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 8.0),
-              child: Column(children: [
-                Row(
-                  children: [
-                    Text("median:"),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(model.stats['median'].toString() ?? ""),
-                    ),
-                  ],
-                ),
-                Row(
-                  children: [
-                    Text("+/-:"),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                          model.stats['standardDeviation'].toString() ?? ""),
+                      child: Text("${median ?? '?'} +/- ${stddev ?? '?'}"),
                     ),
                   ],
                 ),
