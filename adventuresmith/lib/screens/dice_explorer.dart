@@ -214,17 +214,6 @@ class DiceExpressionItem extends StatelessWidget {
     final expressions = Provider.of<DiceExpressions>(context);
     final model = expressions.expressions[index];
 
-    final medianResults = <Widget>[];
-    if (model.hasStats) {
-      medianResults.addAll([
-        Spacer(),
-        Text("Median:"),
-        Text(model.stats["median"].toString()),
-        Text("+/-"),
-        Text(model.stats["standardDeviation"].toString()),
-      ]);
-    }
-
     var median = model.stats["median"];
     var stddev = model.stats["standardDeviation"];
     var min = model.stats['min'];
@@ -236,24 +225,25 @@ class DiceExpressionItem extends StatelessWidget {
           children: [
             Flexible(
               child: Theme(
-                  data: Theme.of(context).copyWith(
-                    primaryColor: DiceStats.colors[index],
-                    unselectedWidgetColor: DiceStats.colors[index],
-                  ),
-                  child: TextFormField(
-                    textCapitalization: TextCapitalization.none,
-                    decoration: const InputDecoration(
-                      hintText: 'Enter a dice expression',
-                      //labelText: 'The label',
-                      icon: Icon(
-                        MdiIcons.diceMultiple,
-                      ),
-                      border: OutlineInputBorder(),
+                data: Theme.of(context).copyWith(
+                  primaryColor: DiceStats.colors[index],
+                  unselectedWidgetColor: DiceStats.colors[index],
+                ),
+                child: TextFormField(
+                  textCapitalization: TextCapitalization.none,
+                  decoration: const InputDecoration(
+                    hintText: 'Enter a dice expression',
+                    //labelText: 'The label',
+                    icon: Icon(
+                      MdiIcons.diceMultiple,
                     ),
-                    initialValue: model.diceExpression,
-                    onFieldSubmitted: (val) => expressions.setExpr(index, val),
-                    validator: model.validator,
-                  )),
+                    border: OutlineInputBorder(),
+                  ),
+                  initialValue: model.diceExpression,
+                  onFieldSubmitted: (val) => expressions.setExpr(index, val),
+                  validator: model.validator,
+                ),
+              ),
             ),
             Padding(
               padding: const EdgeInsets.only(left: 8.0),

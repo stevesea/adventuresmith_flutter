@@ -1,7 +1,6 @@
 // ignore_for_file: public_member_api_docs
 import 'package:adventuresmith/models/dice_expression_model.dart';
 import 'package:adventuresmith/screens/advsmith.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
@@ -46,7 +45,6 @@ class AdventuresmithApp extends StatelessWidget {
     testExpressions.add(DiceExpressionModel());
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(builder: (_) => Counter()),
         ChangeNotifierProvider(builder: (_) => testExpressions),
       ],
       child: MaterialApp(
@@ -60,75 +58,5 @@ class AdventuresmithApp extends StatelessWidget {
         //home: AdventuresmithHomePage(),
       ),
     );
-  }
-}
-
-class Counter with ChangeNotifier {
-  int _count = 0;
-  int get count => _count;
-
-  void increment() {
-    _count++;
-    notifyListeners();
-  }
-}
-
-class MyHomePage extends StatelessWidget {
-  const MyHomePage({Key key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Consumer<Counter>(builder: (context, counter, _) {
-      return Scaffold(
-        appBar: AppBar(title: const Title()),
-        body: const Center(child: CounterLabel()),
-        floatingActionButton: const IncrementCounterButton(),
-      );
-    });
-  }
-}
-
-class IncrementCounterButton extends StatelessWidget {
-  const IncrementCounterButton({Key key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return FloatingActionButton(
-      onPressed: Provider.of<Counter>(context).increment,
-      tooltip: 'Increment',
-      child: const Icon(Icons.add),
-    );
-  }
-}
-
-class CounterLabel extends StatelessWidget {
-  const CounterLabel({Key key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    final counter = Provider.of<Counter>(context);
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        const Text(
-          'You have pushed the button this many times:',
-        ),
-        Text(
-          '${counter.count}',
-          style: Theme.of(context).textTheme.display1,
-        ),
-      ],
-    );
-  }
-}
-
-class Title extends StatelessWidget {
-  const Title({Key key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    final counter = Provider.of<Counter>(context);
-    return Text('Tapped ${counter.count} times');
   }
 }
