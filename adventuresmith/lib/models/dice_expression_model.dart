@@ -52,7 +52,7 @@ class DiceExpressionModel {
   bool get hasStats => _stats.isNotEmpty;
 
   /// sets the current dice expression
-  void setExpression(String expr) {
+  void setExpression(String expr) async {
     _log.finest(expr);
     _diceExpression = expr;
     if (expr == null || expr.isEmpty) {
@@ -75,14 +75,14 @@ class DiceExpressionModel {
   /// returns null if OK, string otherwise
   String validator(String val) {
     if (!diceExp.hasMatch(val)) {
-      return "must match: ${diceExp.pattern}";
+      return "invalid dice expression";
     }
 
     var results = _diceParser.parse(val);
 
     if (results.isFailure) {
       _log.warning("Invalid $results");
-      return "err at position ${results.position}";
+      return "invalid dice expression";
     } else {
       return null;
     }
