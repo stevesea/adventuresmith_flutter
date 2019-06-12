@@ -42,13 +42,168 @@ class DiceExplorerPage extends StatelessWidget {
         actions: [
           IconButton(
             icon: Icon(Icons.help),
-            onPressed: () {},
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: buildAlertDialog,
+              );
+            },
           ),
         ],
       ),
       body: Center(
         child: DiceExplorerScreen(),
       ),
+    );
+  }
+
+  AlertDialog buildAlertDialog(BuildContext context) {
+    return AlertDialog(
+      title: Text("Dice Syntax"),
+      content: Text.rich(
+        TextSpan(
+          children: <TextSpan>[
+            TextSpan(
+              text: "Dice types\n",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            TextSpan(
+              text: 'AdX',
+              style: TextStyle(
+                fontStyle: FontStyle.italic,
+              ),
+            ),
+            TextSpan(
+              text: ' : roll A dice of X sides\n',
+            ),
+            TextSpan(
+              text: 'AdF',
+              style: TextStyle(
+                fontStyle: FontStyle.italic,
+              ),
+            ),
+            TextSpan(
+              text: ' : roll A fudge dice\n',
+            ),
+            TextSpan(
+              text: 'Ad%',
+              style: TextStyle(
+                fontStyle: FontStyle.italic,
+              ),
+            ),
+            TextSpan(
+              text: ' : roll A 100-sided dice\n',
+            ),
+            TextSpan(
+              text: 'AD66',
+              style: TextStyle(
+                fontStyle: FontStyle.italic,
+              ),
+            ),
+            TextSpan(
+              text: ' : roll 1d6*10 + 1d6\n',
+            ),
+            TextSpan(
+              text: 'Ad!X',
+              style: TextStyle(
+                fontStyle: FontStyle.italic,
+              ),
+            ),
+            TextSpan(
+              text: ' : roll A dice of X sides (explode)\n',
+            ),
+            TextSpan(
+              text: 'Ad!!X',
+              style: TextStyle(
+                fontStyle: FontStyle.italic,
+              ),
+            ),
+            TextSpan(
+              text: ' : roll A dice of X sides (explode once)\n\n',
+            ),
+            TextSpan(
+              text: "Modifying results\n",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            TextSpan(
+              text: 'AdX-HN, AdX-LN',
+              style: TextStyle(
+                fontStyle: FontStyle.italic,
+              ),
+            ),
+            TextSpan(
+              text: ' : drop N highest or lowest\n',
+            ),
+            TextSpan(
+              text: 'AdX->B, AdX-<B, AdX-=B',
+              style: TextStyle(
+                fontStyle: FontStyle.italic,
+              ),
+            ),
+            TextSpan(
+              text: ' : drop any greater than, less than, or equal to B\n\n',
+            ),
+            TextSpan(
+              text: 'AdXC<B, AdXC>B',
+              style: TextStyle(
+                fontStyle: FontStyle.italic,
+              ),
+            ),
+            TextSpan(
+              text: ' : change any value less than or greater than B to B\n\n',
+            ),
+            TextSpan(
+              text: "Counting results\n",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            TextSpan(
+              text: 'AdX#>B, AdX#<B, AdX#=B',
+              style: TextStyle(
+                fontStyle: FontStyle.italic,
+              ),
+            ),
+            TextSpan(
+              text:
+                  ' : count how many results are greater than, less than, or equal to B\n\n',
+            ),
+            TextSpan(
+              text: 'AdX#',
+              style: TextStyle(
+                fontStyle: FontStyle.italic,
+              ),
+            ),
+            TextSpan(
+              text:
+                  ' : how many results? \n`20d10-<2->8#` roll 2d10, drop <2 and >8, count # left \n\n',
+            ),
+            TextSpan(
+              text: "Arithmetic\n",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            TextSpan(
+              text:
+                  'addition, subtraction, multiplication and parenthesis are supported',
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        // usually buttons at the bottom of the dialog
+        FlatButton(
+          child: Text("Close"),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
+      ],
     );
   }
 }
