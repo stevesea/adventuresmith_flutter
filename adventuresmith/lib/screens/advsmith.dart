@@ -17,7 +17,7 @@ class _AdventuresmithHomePageState extends State<AdventuresmithHomePage> {
   static const TextStyle optionStyle =
       TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
   static const List<Widget> _widgetOptions = <Widget>[
-    DiceExplorer(),
+    DiceExplorerPage(),
     Text(
       'Index 1: Business',
       style: optionStyle,

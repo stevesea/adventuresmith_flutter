@@ -31,8 +31,8 @@ class OrdinalDiceResult {
   OrdinalDiceResult(this.result, this.count);
 }
 
-class DiceExplorer extends StatelessWidget {
-  const DiceExplorer({Key key}) : super(key: key);
+class DiceExplorerPage extends StatelessWidget {
+  const DiceExplorerPage({Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
