@@ -33,9 +33,6 @@ class _AdventuresmithHomePageState extends State<AdventuresmithHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Adventuresmith'),
-      ),
       body: Center(
         child: _widgetOptions.elementAt(_selectedIndex),
       ),

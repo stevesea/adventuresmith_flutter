@@ -36,28 +36,52 @@ class DiceExplorerPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Dice Stats Explorer'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.help),
+            onPressed: () {},
+          ),
+        ],
+      ),
+      body: Center(
+        child: DiceExplorerScreen(),
+      ),
+    );
+  }
+}
+
+class DiceExplorerScreen extends StatelessWidget {
+  const DiceExplorerScreen({Key key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
     return Consumer<DiceExpressions>(builder: (context, diceExpressions, _) {
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10.0),
         child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 10.0),
-                  child: ListView.separated(
-                    itemCount: diceExpressions.expressions.length,
-                    separatorBuilder: (context, index) => Divider(),
-                    itemBuilder: (context, index) => DiceExpressionItem(index),
-                  ),
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.only(left: 10.0),
+                child: ListView.separated(
+                  itemCount: diceExpressions.expressions.length,
+                  separatorBuilder: (context, index) => Divider(),
+                  itemBuilder: (context, index) => DiceExpressionItem(index),
                 ),
               ),
-              Divider(),
-              Expanded(
-                child: DiceStats(diceExpressions.expressions),
-              ),
-            ]),
+            ),
+            Divider(),
+            Text("Rolls: ${DiceExpressionModel.numRollsForStats}"),
+            Expanded(
+              child: DiceStats(diceExpressions.expressions),
+            ),
+          ],
+        ),
       );
     });
   }
@@ -192,10 +216,13 @@ class DiceStats extends StatelessWidget {
       seriesList,
       animate: true,
       behaviors: gatherBehaviors(),
+      /*
       primaryMeasureAxis: charts.NumericAxisSpec(
         showAxisLine: false, // don't show axis line
         renderSpec: charts.NoneRenderSpec(),
       ),
+
+       */
       customSeriesRenderers: [
         charts.SymbolAnnotationRendererConfig(
           customRendererId: 'customSymbolAnnotation',
@@ -281,12 +308,7 @@ class DiceExpressionItemState extends State<DiceExpressionItem> {
                           ),
                           Row(
                             children: [
-                              Text("med:"),
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text(
-                                    "${median ?? '?'} +/- ${stddev ?? '?'}"),
-                              ),
+                              Text("${median ?? '?'} +/- ${stddev ?? '?'}"),
                             ],
                           ),
                         ]),
