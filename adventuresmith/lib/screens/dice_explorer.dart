@@ -230,11 +230,14 @@ class DiceExplorerScreen extends StatelessWidget {
                 ),
               ),
             ),
+            if (diceExpressions.hasResults) Divider(),
+            if (diceExpressions.hasResults)
+              Text("total rolls: ${DiceExpressionModel.numRollsForStats}"),
             Divider(),
-            Text("Rolls: ${DiceExpressionModel.numRollsForStats}"),
-            Expanded(
-              child: DiceStats(diceExpressions.expressions),
-            ),
+            if (diceExpressions.hasResults)
+              Expanded(
+                child: DiceStats(diceExpressions.expressions),
+              ),
           ],
         ),
       );
@@ -274,21 +277,21 @@ class DiceStats extends StatelessWidget {
           colorFn: (_, __) => palette,
         ));
 
-        var median = diceExpressionModel.stats["median"];
-        var stddev = diceExpressionModel.stats["standardDeviation"];
-        var low = median - stddev;
-        var high = median + stddev;
+        var mean = diceExpressionModel.stats["mean"];
+        var stddev = diceExpressionModel.stats["stddev"];
+        var low = mean - stddev;
+        var high = mean + stddev;
 
         series.add(charts.Series<OrdinalDiceResult, num>(
           id: "${diceExpressionModel.diceExpression} annotation $ind",
-          domainFn: (r, _) => median,
+          domainFn: (r, _) => mean,
           domainLowerBoundFn: (r, _) => low,
           domainUpperBoundFn: (r, _) => high,
           measureFn: (_, __) =>
               null, // no measure values are needed for symbol annotations
           data: [
             OrdinalDiceResult(low, null),
-            OrdinalDiceResult(median, null),
+            OrdinalDiceResult(mean, null),
             OrdinalDiceResult(high, null),
           ],
           colorFn: (_, __) => palette,
@@ -307,12 +310,12 @@ class DiceStats extends StatelessWidget {
     var ind = 0;
     for (final diceExpressionModel in _expressions) {
       if (diceExpressionModel.hasStats) {
-        var median = diceExpressionModel.stats["median"];
+        var mean = diceExpressionModel.stats["mean"];
         var palette = palettes[ind].shadeDefault;
         /*
-        var stddev = diceExpressionModel.stats["standardDeviation"];
-        var low = median - stddev;
-        var high = median + stddev;
+        var stddev = diceExpressionModel.stats["stddev"];
+        var low = mean - stddev;
+        var high = mean + stddev;
         annotations.add(charts.RangeAnnotationSegment(
           low,
           high,
@@ -328,9 +331,9 @@ class DiceStats extends StatelessWidget {
 
         annotations.add(
           charts.LineAnnotationSegment(
-            median,
+            mean,
             charts.RangeAnnotationAxisType.domain,
-            startLabel: median.toString(),
+            startLabel: mean.toString(),
             color: palette.lighter,
             labelAnchor: charts.AnnotationLabelAnchor.end,
             labelDirection: charts.AnnotationLabelDirection.vertical,
@@ -348,7 +351,7 @@ class DiceStats extends StatelessWidget {
     ));
 
     // don't enable series legend until figure out how to hide series.
-    // (otherwise, the annotation series highlighting median+stddev shows up)
+    // (otherwise, the annotation series highlighting mean+stddev shows up)
     //behaviors.add(charts.SeriesLegend());
     return behaviors;
   }
@@ -409,8 +412,8 @@ class DiceExpressionItemState extends State<DiceExpressionItem> {
     final expressions = Provider.of<DiceExpressions>(context);
     final model = expressions.expressions[_index];
 
-    var median = model.stats["median"];
-    var stddev = model.stats["standardDeviation"];
+    var mean = model.stats["mean"];
+    var stddev = model.stats["stddev"];
     var min = model.stats['min'];
     var max = model.stats['max'];
 
@@ -440,9 +443,9 @@ class DiceExpressionItemState extends State<DiceExpressionItem> {
                       border: OutlineInputBorder(),
                     ),
                     initialValue: model.diceExpression,
-                    onFieldSubmitted: (val) {
+                    onFieldSubmitted: (val) async {
                       if (_formKey.currentState.validate()) {
-                        expressions.setExpr(_index, val);
+                        await expressions.setExpr(_index, val);
                       }
                     },
                     validator: model.validator,
@@ -454,16 +457,16 @@ class DiceExpressionItemState extends State<DiceExpressionItem> {
                         child: Column(children: [
                           Row(
                             children: [
-                              Text("min/max:"),
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text("${min ?? '?'} / ${max ?? '?'}"),
-                              ),
+                              Text("${mean ?? '?'} ± ${stddev ?? '?'}"),
                             ],
                           ),
                           Row(
                             children: [
-                              Text("${median ?? '?'} +/- ${stddev ?? '?'}"),
+                              Text("min, max:"),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text("${min ?? '?'}, ${max ?? '?'}"),
+                              ),
                             ],
                           ),
                         ]),

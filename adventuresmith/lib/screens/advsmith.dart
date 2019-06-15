@@ -19,7 +19,7 @@ class _AdventuresmithHomePageState extends State<AdventuresmithHomePage> {
   static const List<Widget> _widgetOptions = <Widget>[
     DiceExplorerPage(),
     Text(
-      'Index 1: Business',
+      'Index 1: Roll!',
       style: optionStyle,
     ),
   ];
@@ -43,12 +43,12 @@ class _AdventuresmithHomePageState extends State<AdventuresmithHomePage> {
             title: Text('Dice Stats'),
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.business),
-            title: Text('Business'),
+            icon: Icon(MdiIcons.dice3),
+            title: Text('Roll!'),
           ),
         ],
         currentIndex: _selectedIndex,
-        selectedItemColor: Colors.amber[800],
+        selectedItemColor: Colors.deepOrange[800],
         onTap: _onItemTapped,
       ),
     );

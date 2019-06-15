@@ -9,6 +9,11 @@ class DiceExpressions with ChangeNotifier {
   /// retrieve current list of expressions
   List<DiceExpressionModel> get expressions => _expressions;
 
+  bool get hasResults {
+    var filtered = _expressions.where((expr) => expr.hasStats);
+    return filtered.isNotEmpty;
+  }
+
   /// add a new expression
   void add(final DiceExpressionModel item) {
     _expressions.add(item);
@@ -64,7 +69,7 @@ class DiceExpressionModel {
     if (results.isFailure) {
       _stats = {};
     } else {
-      _stats = _diceParser.stats(
+      _stats = await _diceParser.stats(
           diceStr: diceExpression, numRolls: numRollsForStats);
       _log.finest(_stats);
     }
