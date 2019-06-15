@@ -71,7 +71,7 @@ class DiceExpressionModel {
     } else {
       _stats = await _diceParser.stats(
           diceStr: diceExpression, numRolls: numRollsForStats);
-      _log.finest(_stats);
+      _log.fine(_stats);
     }
   }
 

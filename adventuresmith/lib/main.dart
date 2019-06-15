@@ -6,7 +6,7 @@ import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 
 void main() {
-  Logger.root.level = Level.INFO;
+  Logger.root.level = Level.FINE;
 
   Logger.root.onRecord.listen((rec) {
     print('$rec');
