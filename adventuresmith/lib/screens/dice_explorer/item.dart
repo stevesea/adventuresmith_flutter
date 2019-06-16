@@ -108,7 +108,7 @@ class DiceExpressionItemState extends State<DiceExpressionItem> {
                         Text("min, max:"),
                         Padding(
                           padding: const EdgeInsets.all(8.0),
-                          child: Text("${min ?? '?'} ↔ ${max ?? '?'}"),
+                          child: Text("${min ?? '?'} → ${max ?? '?'}"),
                         ),
                       ],
                     ),
