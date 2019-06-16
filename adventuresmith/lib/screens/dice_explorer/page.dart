@@ -45,13 +45,10 @@ class DiceExplorerScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Expanded(
-              child: Padding(
-                padding: const EdgeInsets.only(left: 10.0),
-                child: ListView.separated(
-                  itemCount: diceExpressions.expressions.length,
-                  separatorBuilder: (context, index) => Divider(),
-                  itemBuilder: (context, index) => DiceExpressionItem(index),
-                ),
+              child: ListView.separated(
+                itemCount: diceExpressions.expressions.length,
+                separatorBuilder: (context, index) => Divider(),
+                itemBuilder: (context, index) => DiceExpressionItem(index),
               ),
             ),
             if (diceExpressions.hasResults) Divider(),
