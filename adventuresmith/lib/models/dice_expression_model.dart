@@ -49,6 +49,10 @@ class DiceExpressionModel {
   String get diceExpression => _diceExpression;
   String _diceExpression;
 
+  /// null if no error on latest expression
+  String get validationError => _validationError;
+  String _validationError;
+
   /// the stats related to the current expression
   Map<String, dynamic> get stats => _stats;
   Map<String, dynamic> _stats = {};
@@ -59,15 +63,17 @@ class DiceExpressionModel {
   /// sets the current dice expression
   void setExpression(String expr) async {
     _log.finest(expr);
-    _diceExpression = expr;
+    _diceExpression = expr.trim();
+
+    // if null or empty, clear out state
     if (expr == null || expr.isEmpty) {
       _stats = {};
+      _validationError = null;
       return;
     }
-    expr = expr.trim();
 
-    var results = _diceParser.parse(_diceExpression);
-    if (results.isFailure) {
+    _validationError = validator(diceExpression);
+    if (_validationError != null) {
       _stats = {};
     } else {
       _stats = await _diceParser.stats(
@@ -76,19 +82,17 @@ class DiceExpressionModel {
     }
   }
 
-  final RegExp diceExp = RegExp(r'^[dDcClLhHF0-9 +-<>%#!=]*$');
+  final RegExp _diceExp = RegExp(r'^[dDcClLhHF0-9 +-<>%#!=]*$');
 
   /// returns null if OK, string otherwise
   String validator(String val) {
-    _log.info("validating $val");
-    if (!diceExp.hasMatch(val)) {
-      return "invalid dice expression";
+    if (!_diceExp.hasMatch(val)) {
+      return "invalid char in dice expression";
     }
 
     var results = _diceParser.parse(val);
 
     if (results.isFailure) {
-      _log.warning("Invalid $results");
       return "invalid dice expression";
     } else {
       return null;

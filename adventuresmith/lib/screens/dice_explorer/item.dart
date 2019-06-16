@@ -25,6 +25,14 @@ class DiceExpressionItemState extends State<DiceExpressionItem> {
   final _log = Logger('DiceExpressionItemState');
   var _controller = TextEditingController();
   Timer _debounce;
+  String _validatorStr;
+  DiceExpressionModel _model;
+
+  @override
+  void initState() {
+    _controller.addListener(() {});
+    super.initState();
+  }
 
   @override
   void dispose() {
@@ -36,18 +44,18 @@ class DiceExpressionItemState extends State<DiceExpressionItem> {
   @override
   Widget build(BuildContext context) {
     final expressions = Provider.of<DiceExpressions>(context);
-    final model = expressions.expressions[_index];
+    _model = expressions.expressions[_index];
 
     if (_controller.text.isEmpty) {
       // only set controller text if it's empty. if we always reset the text,
       // then cursor position gets messed up
-      _controller.text = model.diceExpression;
+      _controller.text = _model.diceExpression;
     }
 
-    var mean = model.stats["mean"];
-    var stddev = model.stats["stddev"];
-    var min = model.stats['min'];
-    var max = model.stats['max'];
+    var mean = _model.stats["mean"];
+    var stddev = _model.stats["stddev"];
+    var min = _model.stats['min'];
+    var max = _model.stats['max'];
 
     return Theme(
       data: Theme.of(context).copyWith(
@@ -71,58 +79,26 @@ class DiceExpressionItemState extends State<DiceExpressionItem> {
                   textCapitalization: TextCapitalization.none,
                   textInputAction: TextInputAction.continueAction,
                   controller: _controller,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     hintText: 'Enter a dice expression',
                     border: OutlineInputBorder(),
-                    // TODO: how to set error text on validation?
+                    errorText: _model.validationError,
                   ),
                   onChanged: (val) {
-                    _log.info("onChanged: $val");
-
-                    if (val == model.diceExpression) {
+                    if (val == _model.diceExpression) {
                       _debounce?.cancel();
                       return;
                     }
                     if (_debounce != null) {
                       _debounce.cancel();
                     }
-                    _debounce = Timer(Duration(seconds: 1), () {
-                      _log.info("onChanged timer");
+                    _debounce = Timer(Duration(milliseconds: 500), () {
                       expressions.setExpr(_index, _controller.text);
                     });
                   },
-                  // TODO: onChanged firing, but not onEditingComplete/onSubmitted?? whyfor?
-                  onEditingComplete: () {
-                    _log.info("onEditingComplete");
-                    if (_debounce != null) {
-                      _debounce.cancel();
-                    }
-                    if (_controller.text.isEmpty) {
-                      Future(() {
-                        _log.info("onEditingComplete future");
-                        expressions.setExpr(_index, _controller.text);
-                      });
-                    } else {
-                      expressions.setExpr(_index, _controller.text);
-                    }
-                  },
-                  onSubmitted: (_) {
-                    _log.info("onSubmitted");
-                    if (_debounce != null) {
-                      _debounce.cancel();
-                    }
-                    if (_controller.text.isEmpty) {
-                      Future(() {
-                        _log.info("onSubmitted future");
-                        expressions.setExpr(_index, _controller.text);
-                      });
-                    } else {
-                      expressions.setExpr(_index, _controller.text);
-                    }
-                  },
                 ),
               ),
-              if (model.hasStats)
+              if (_model.hasStats)
                 Padding(
                   padding: const EdgeInsets.only(left: 8.0),
                   child: Column(children: [
