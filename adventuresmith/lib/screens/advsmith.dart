@@ -1,4 +1,4 @@
-import 'package:adventuresmith/screens/dice_explorer.dart';
+import 'package:adventuresmith/screens/dice_explorer/page.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
