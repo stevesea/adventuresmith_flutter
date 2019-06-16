@@ -80,6 +80,7 @@ class DiceExpressionModel {
 
   /// returns null if OK, string otherwise
   String validator(String val) {
+    _log.info("validating $val");
     if (!diceExp.hasMatch(val)) {
       return "invalid dice expression";
     }
