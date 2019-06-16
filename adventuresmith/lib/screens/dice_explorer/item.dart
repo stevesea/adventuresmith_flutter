@@ -27,6 +27,13 @@ class DiceExpressionItemState extends State<DiceExpressionItem> {
   Timer _debounce;
 
   @override
+  void dispose() {
+    _debounce.cancel();
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final expressions = Provider.of<DiceExpressions>(context);
     final model = expressions.expressions[_index];
@@ -64,33 +71,47 @@ class DiceExpressionItemState extends State<DiceExpressionItem> {
                     border: OutlineInputBorder(),
                   ),
                   onChanged: (val) {
-                    var duration = Duration(seconds: 5);
+                    _log.info("onChanged: $val");
 
                     if (val == model.diceExpression) {
+                      _debounce?.cancel();
                       return;
                     }
                     if (_debounce != null) {
                       _debounce.cancel();
                     }
-                    _debounce = Timer(duration, () {
+                    _debounce = Timer(Duration(seconds: 1), () {
+                      _log.info("onChanged timer");
                       expressions.setExpr(_index, _controller.text);
                     });
                   },
                   onEditingComplete: () {
+                    _log.info("onEditingComplete");
                     if (_debounce != null) {
                       _debounce.cancel();
                     }
-                    Future(() {
+                    if (_controller.text.isEmpty) {
+                      Future(() {
+                        _log.info("onEditingComplete future");
+                        expressions.setExpr(_index, _controller.text);
+                      });
+                    } else {
                       expressions.setExpr(_index, _controller.text);
-                    });
+                    }
                   },
                   onSubmitted: (_) {
+                    _log.info("onSubmitted");
                     if (_debounce != null) {
                       _debounce.cancel();
                     }
-                    Future(() {
+                    if (_controller.text.isEmpty) {
+                      Future(() {
+                        _log.info("onSubmitted future");
+                        expressions.setExpr(_index, _controller.text);
+                      });
+                    } else {
                       expressions.setExpr(_index, _controller.text);
-                    });
+                    }
                   },
                 ),
               ),
