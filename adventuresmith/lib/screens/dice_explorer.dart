@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:adventuresmith/models/dice_expression_model.dart';
 import 'package:charts_common/common.dart' as charts_common;
 import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:flutter/material.dart';
+import 'package:logging/logging.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:provider/provider.dart';
 
@@ -59,138 +62,150 @@ class DiceExplorerPage extends StatelessWidget {
 
   AlertDialog buildAlertDialog(BuildContext context) {
     return AlertDialog(
-      title: Text("Dice Syntax"),
-      content: Text.rich(
-        TextSpan(
-          children: <TextSpan>[
-            TextSpan(
-              text: "Dice types\n",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
+      title: Text("Dice Syntax", style: Theme.of(context).textTheme.headline),
+      content: Container(
+        width: double.maxFinite,
+        child: ListView(
+          children: [
+            Text.rich(
+              TextSpan(
+                children: <TextSpan>[
+                  TextSpan(
+                    text: "Dice types\n",
+                    style: Theme.of(context).textTheme.title,
+                  ),
+                  TextSpan(
+                    text: 'AdX',
+                    style: Theme.of(context).textTheme.body2,
+                  ),
+                  TextSpan(
+                    text: ' : roll A dice of X sides\n',
+                    style: Theme.of(context).textTheme.body1,
+                  ),
+                  TextSpan(
+                    text: 'AdF',
+                    style: Theme.of(context).textTheme.body2,
+                  ),
+                  TextSpan(
+                    text: ' : roll A fudge dice\n',
+                    style: Theme.of(context).textTheme.body1,
+                  ),
+                  TextSpan(
+                    text: 'Ad%',
+                    style: Theme.of(context).textTheme.body2,
+                  ),
+                  TextSpan(
+                    text: ' : roll A 100-sided dice\n',
+                    style: Theme.of(context).textTheme.body1,
+                  ),
+                  TextSpan(
+                    text: 'AD66',
+                    style: Theme.of(context).textTheme.body2,
+                  ),
+                  TextSpan(
+                    text: ' : roll 1d6*10 + 1d6\n',
+                    style: Theme.of(context).textTheme.body1,
+                  ),
+                  TextSpan(
+                    text: 'Ad!X',
+                    style: Theme.of(context).textTheme.body2,
+                  ),
+                  TextSpan(
+                    text: ' : roll A dice of X sides (explode)\n',
+                    style: Theme.of(context).textTheme.body1,
+                  ),
+                  TextSpan(
+                    text: 'Ad!!X',
+                    style: Theme.of(context).textTheme.body2,
+                  ),
+                  TextSpan(
+                    text: ' : roll A dice of X sides (explode once)\n',
+                    style: Theme.of(context).textTheme.body1,
+                  ),
+                ],
               ),
             ),
-            TextSpan(
-              text: 'AdX',
-              style: TextStyle(
-                fontStyle: FontStyle.italic,
+            Divider(),
+            Text.rich(
+              TextSpan(
+                children: <TextSpan>[
+                  TextSpan(
+                    text: "Modifying results\n",
+                    style: Theme.of(context).textTheme.title,
+                  ),
+                  TextSpan(
+                    text: 'AdX-HN, AdX-LN',
+                    style: Theme.of(context).textTheme.body2,
+                  ),
+                  TextSpan(
+                    text: ' : drop N highest or lowest\n',
+                    style: Theme.of(context).textTheme.body1,
+                  ),
+                  TextSpan(
+                    text: 'AdX->B, AdX-<B, AdX-=B',
+                    style: Theme.of(context).textTheme.body2,
+                  ),
+                  TextSpan(
+                    text:
+                        ' : drop any greater than, less than, or equal to B\n\n',
+                    style: Theme.of(context).textTheme.body1,
+                  ),
+                  TextSpan(
+                    text: 'AdXC<B, AdXC>B',
+                    style: Theme.of(context).textTheme.body2,
+                  ),
+                  TextSpan(
+                    text:
+                        ' : change any value less than or greater than B to B\n',
+                    style: Theme.of(context).textTheme.body1,
+                  ),
+                ],
               ),
             ),
-            TextSpan(
-              text: ' : roll A dice of X sides\n',
-            ),
-            TextSpan(
-              text: 'AdF',
-              style: TextStyle(
-                fontStyle: FontStyle.italic,
+            Divider(),
+            Text.rich(
+              TextSpan(
+                children: <TextSpan>[
+                  TextSpan(
+                    text: "Counting results\n",
+                    style: Theme.of(context).textTheme.title,
+                  ),
+                  TextSpan(
+                    text: 'AdX#>B, AdX#<B, AdX#=B',
+                    style: Theme.of(context).textTheme.body2,
+                  ),
+                  TextSpan(
+                    text:
+                        ' : count how many results are greater than, less than, or equal to B\n\n',
+                    style: Theme.of(context).textTheme.body1,
+                  ),
+                  TextSpan(
+                    text: 'AdX#',
+                    style: Theme.of(context).textTheme.body2,
+                  ),
+                  TextSpan(
+                    text:
+                        ' : how many results? \n`20d10-<2->8#` roll 2d10, drop <2 and >8, count # left \n',
+                    style: Theme.of(context).textTheme.body1,
+                  ),
+                ],
               ),
             ),
-            TextSpan(
-              text: ' : roll A fudge dice\n',
-            ),
-            TextSpan(
-              text: 'Ad%',
-              style: TextStyle(
-                fontStyle: FontStyle.italic,
+            Divider(),
+            Text.rich(
+              TextSpan(
+                children: <TextSpan>[
+                  TextSpan(
+                    text: "Arithmetic\n",
+                    style: Theme.of(context).textTheme.title,
+                  ),
+                  TextSpan(
+                    text:
+                        'addition, subtraction, multiplication and parenthesis are supported',
+                    style: Theme.of(context).textTheme.body1,
+                  ),
+                ],
               ),
-            ),
-            TextSpan(
-              text: ' : roll A 100-sided dice\n',
-            ),
-            TextSpan(
-              text: 'AD66',
-              style: TextStyle(
-                fontStyle: FontStyle.italic,
-              ),
-            ),
-            TextSpan(
-              text: ' : roll 1d6*10 + 1d6\n',
-            ),
-            TextSpan(
-              text: 'Ad!X',
-              style: TextStyle(
-                fontStyle: FontStyle.italic,
-              ),
-            ),
-            TextSpan(
-              text: ' : roll A dice of X sides (explode)\n',
-            ),
-            TextSpan(
-              text: 'Ad!!X',
-              style: TextStyle(
-                fontStyle: FontStyle.italic,
-              ),
-            ),
-            TextSpan(
-              text: ' : roll A dice of X sides (explode once)\n\n',
-            ),
-            TextSpan(
-              text: "Modifying results\n",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            TextSpan(
-              text: 'AdX-HN, AdX-LN',
-              style: TextStyle(
-                fontStyle: FontStyle.italic,
-              ),
-            ),
-            TextSpan(
-              text: ' : drop N highest or lowest\n',
-            ),
-            TextSpan(
-              text: 'AdX->B, AdX-<B, AdX-=B',
-              style: TextStyle(
-                fontStyle: FontStyle.italic,
-              ),
-            ),
-            TextSpan(
-              text: ' : drop any greater than, less than, or equal to B\n\n',
-            ),
-            TextSpan(
-              text: 'AdXC<B, AdXC>B',
-              style: TextStyle(
-                fontStyle: FontStyle.italic,
-              ),
-            ),
-            TextSpan(
-              text: ' : change any value less than or greater than B to B\n\n',
-            ),
-            TextSpan(
-              text: "Counting results\n",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            TextSpan(
-              text: 'AdX#>B, AdX#<B, AdX#=B',
-              style: TextStyle(
-                fontStyle: FontStyle.italic,
-              ),
-            ),
-            TextSpan(
-              text:
-                  ' : count how many results are greater than, less than, or equal to B\n\n',
-            ),
-            TextSpan(
-              text: 'AdX#',
-              style: TextStyle(
-                fontStyle: FontStyle.italic,
-              ),
-            ),
-            TextSpan(
-              text:
-                  ' : how many results? \n`20d10-<2->8#` roll 2d10, drop <2 and >8, count # left \n\n',
-            ),
-            TextSpan(
-              text: "Arithmetic\n",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            TextSpan(
-              text:
-                  'addition, subtraction, multiplication and parenthesis are supported',
             ),
           ],
         ),
@@ -405,12 +420,15 @@ class DiceExpressionItemState extends State<DiceExpressionItem> {
   Color get color => paletteIndexToColor(_index);
   final int _index;
   DiceExpressionItemState(this._index);
-  final _formKey = GlobalKey<FormState>();
+  final _log = Logger('DiceExpressionItemState');
+  var _controller = TextEditingController();
+  Timer _debounce;
 
   @override
   Widget build(BuildContext context) {
     final expressions = Provider.of<DiceExpressions>(context);
     final model = expressions.expressions[_index];
+    _controller.text = model.diceExpression;
 
     var mean = model.stats["mean"];
     var stddev = model.stats["stddev"];
@@ -423,59 +441,80 @@ class DiceExpressionItemState extends State<DiceExpressionItem> {
         unselectedWidgetColor: color,
         iconTheme: IconThemeData(color: color),
       ),
-      child: Form(
-        key: _formKey,
-        child: Column(
-          children: [
-            Row(
-              children: [
-                IconButton(
-                  icon: Icon(
-                    MdiIcons.diceMultiple,
-                  ),
-                  onPressed: () {},
+      child: Column(
+        children: [
+          Row(
+            children: [
+              IconButton(
+                icon: Icon(
+                  MdiIcons.diceMultiple,
                 ),
-                Flexible(
-                  child: TextFormField(
-                    textCapitalization: TextCapitalization.none,
-                    decoration: const InputDecoration(
-                      hintText: 'Enter a dice expression',
-                      border: OutlineInputBorder(),
+                onPressed: () {},
+              ),
+              Flexible(
+                child: TextField(
+                  autocorrect: false,
+                  textCapitalization: TextCapitalization.none,
+                  textInputAction: TextInputAction.continueAction,
+                  controller: _controller,
+                  decoration: const InputDecoration(
+                    hintText: 'Enter a dice expression',
+                    border: OutlineInputBorder(),
+                  ),
+                  onChanged: (val) {
+                    var duration = Duration(seconds: 5);
+
+                    if (val == model.diceExpression) {
+                      return;
+                    }
+                    if (_debounce != null) {
+                      _debounce.cancel();
+                    }
+                    _debounce = Timer(duration, () {
+                      expressions.setExpr(_index, _controller.text);
+                    });
+                  },
+                  onEditingComplete: () {
+                    if (_debounce != null) {
+                      _debounce.cancel();
+                    }
+                    Future(() {
+                      expressions.setExpr(_index, _controller.text);
+                    });
+                  },
+                  onSubmitted: (_) {
+                    if (_debounce != null) {
+                      _debounce.cancel();
+                    }
+                    Future(() {
+                      expressions.setExpr(_index, _controller.text);
+                    });
+                  },
+                ),
+              ),
+              if (model.hasStats)
+                Padding(
+                  padding: const EdgeInsets.only(left: 8.0),
+                  child: Column(children: [
+                    Row(
+                      children: [
+                        Text("${mean ?? '?'} ± ${stddev ?? '?'}"),
+                      ],
                     ),
-                    initialValue: model.diceExpression,
-                    onFieldSubmitted: (val) async {
-                      if (_formKey.currentState.validate()) {
-                        await expressions.setExpr(_index, val);
-                      }
-                    },
-                    validator: model.validator,
-                  ),
+                    Row(
+                      children: [
+                        Text("min, max:"),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text("${min ?? '?'} ↔ ${max ?? '?'}"),
+                        ),
+                      ],
+                    ),
+                  ]),
                 ),
-                model.hasStats
-                    ? Padding(
-                        padding: const EdgeInsets.only(left: 8.0),
-                        child: Column(children: [
-                          Row(
-                            children: [
-                              Text("${mean ?? '?'} ± ${stddev ?? '?'}"),
-                            ],
-                          ),
-                          Row(
-                            children: [
-                              Text("min, max:"),
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text("${min ?? '?'}, ${max ?? '?'}"),
-                              ),
-                            ],
-                          ),
-                        ]),
-                      )
-                    : Text(""),
-              ],
-            ),
-          ],
-        ),
+            ],
+          ),
+        ],
       ),
     );
   }
