@@ -37,7 +37,12 @@ class DiceExpressionItemState extends State<DiceExpressionItem> {
   Widget build(BuildContext context) {
     final expressions = Provider.of<DiceExpressions>(context);
     final model = expressions.expressions[_index];
-    _controller.text = model.diceExpression;
+
+    if (_controller.text.isEmpty) {
+      // only set controller text if it's empty. if we always reset the text,
+      // then cursor position gets messed up
+      _controller.text = model.diceExpression;
+    }
 
     var mean = model.stats["mean"];
     var stddev = model.stats["stddev"];
@@ -69,6 +74,7 @@ class DiceExpressionItemState extends State<DiceExpressionItem> {
                   decoration: const InputDecoration(
                     hintText: 'Enter a dice expression',
                     border: OutlineInputBorder(),
+                    // TODO: how to set error text on validation?
                   ),
                   onChanged: (val) {
                     _log.info("onChanged: $val");
@@ -85,6 +91,7 @@ class DiceExpressionItemState extends State<DiceExpressionItem> {
                       expressions.setExpr(_index, _controller.text);
                     });
                   },
+                  // TODO: onChanged firing, but not onEditingComplete/onSubmitted?? whyfor?
                   onEditingComplete: () {
                     _log.info("onEditingComplete");
                     if (_debounce != null) {
