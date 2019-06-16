@@ -64,6 +64,7 @@ class DiceExpressionModel {
       _stats = {};
       return;
     }
+    expr = expr.trim();
 
     var results = _diceParser.parse(_diceExpression);
     if (results.isFailure) {
