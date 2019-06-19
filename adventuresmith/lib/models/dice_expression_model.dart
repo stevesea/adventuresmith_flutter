@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:dart_dice_parser/dart_dice_parser.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:logging/logging.dart';
@@ -7,7 +9,8 @@ class DiceExpressions with ChangeNotifier {
   final _expressions = <DiceExpressionModel>[];
 
   /// retrieve current list of expressions
-  List<DiceExpressionModel> get expressions => _expressions;
+  UnmodifiableListView<DiceExpressionModel> get expressions =>
+      UnmodifiableListView(_expressions);
 
   bool get hasResults {
     var filtered = _expressions.where((expr) => expr.hasStats);
@@ -50,11 +53,12 @@ class DiceExpressionModel {
   String _diceExpression;
 
   /// null if no error on latest expression
+
   String get validationError => _validationError;
   String _validationError;
 
   /// the stats related to the current expression
-  Map<String, dynamic> get stats => _stats;
+  UnmodifiableMapView<String, dynamic> get stats => UnmodifiableMapView(_stats);
   Map<String, dynamic> _stats = {};
 
   /// is stats map populated?
@@ -72,7 +76,7 @@ class DiceExpressionModel {
       return;
     }
 
-    _validationError = validator(diceExpression);
+    _validationError = _validator(diceExpression);
     if (_validationError != null) {
       _stats = {};
     } else {
@@ -85,7 +89,7 @@ class DiceExpressionModel {
   final RegExp _diceExp = RegExp(r'^[dDcClLhHF0-9 +-<>%#!=]*$');
 
   /// returns null if OK, string otherwise
-  String validator(String val) {
+  String _validator(String val) {
     if (!_diceExp.hasMatch(val)) {
       return "invalid char in dice expression";
     }

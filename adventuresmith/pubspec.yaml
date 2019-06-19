@@ -19,7 +19,7 @@ environment:
 dependencies:
   charts_flutter: ^0.6.0
   provider: ^3.0.0
-  dart_dice_parser: ^1.4.1
+  dart_dice_parser: ^1.4.2
   material_design_icons_flutter: 3.2.3695
 
   flutter:
@@ -33,6 +33,7 @@ dev_dependencies:
   flutter_launcher_icons: "^0.7.2"
   flutter_test:
     sdk: flutter
+  mockito: ^4.1.0
 
 
 # to rebuild the icons:
