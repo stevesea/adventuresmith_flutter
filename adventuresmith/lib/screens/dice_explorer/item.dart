@@ -36,8 +36,8 @@ class DiceExpressionItemState extends State<DiceExpressionItem> {
 
   @override
   void dispose() {
-    _debounce.cancel();
-    _controller.dispose();
+    _debounce?.cancel();
+    _controller?.dispose();
     super.dispose();
   }
 
